@@ -10,6 +10,7 @@ pipeline {
     environment {
         AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        DOCKER_CREDENTIALS = credentials('DockerCredentials')
         IMAGE_VERSION = "v1.0"
         IMAGE_REGISTRY = "gulammoideen/javaapp"
         AWS_REGION = "us-east-1"
@@ -37,6 +38,7 @@ pipeline {
                             booleanParam(name: 'Destroy', defaultValue: false, description: 'Check if you want to Destroy'),
                         ])
                     ])
+                    sh 'docker login --username gulammoideen -password-stdin dckr_pat_1RMyrNy42eYqEUDptfK00KKXAVg'
                 }
             }
         }
