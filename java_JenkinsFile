@@ -39,7 +39,7 @@ pipeline {
                         ])
                     ])
                     withCredentials([usernamePassword(credentialsId: 'DockerCredentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD https://hub.docker.com/r/gulammoideen/javaapp'
+                    sh 'docker login -u $DOCKER_USERNAME --password-stdin $DOCKER_PASSWORD'
                     }
                 }
             }
