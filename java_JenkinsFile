@@ -108,15 +108,15 @@ pipeline {
                 }
             }
         }
-        // stage('Plan') {
-        //     when { expression { "${params.Apply}" == 'true' } }
-		//     steps {
-		// 	    sh """pwd;cd ${WORKSPACE} ; terraform init"""
-        //         sh """pwd;cd ${WORKSPACE} ; terraform plan -out tfplan"""
-        //         sh """pwd;cd ${WORKSPACE} ; terraform show -no-color tfplan > ${WORKSPACE}/tfplan.txt"""
+        stage('Plan') {
+            when { expression { "${params.Apply}" == 'true' } }
+		    steps {
+			    sh """pwd;cd ${WORKSPACE} ; terraform init"""
+                sh """pwd;cd ${WORKSPACE} ; terraform plan -out tfplan"""
+                sh """pwd;cd ${WORKSPACE} ; terraform show -no-color tfplan > ${WORKSPACE}/tfplan.txt"""
 
-		// 	}
-		// }
+			}
+		}
         // stage('Approval'){
         //     when {
         //         not {
