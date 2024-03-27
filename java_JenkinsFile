@@ -49,7 +49,7 @@ pipeline {
                 checkout([$class: 'GitSCM',
                           branches: [[name: "main"]],
                           doGenerateSubmoduleConfigurations: false,
-                          extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'aws_apache2_ubuntu']],
+                        //   extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'aws_apache2_ubuntu']],
                           gitTool: 'Default',
                           submoduleCfg: [],
                           userRemoteConfigs: [[credentialsId: 'private.gulam', url: 'https://github.com/gulammoideen/Java_App_Deployment.git']]
