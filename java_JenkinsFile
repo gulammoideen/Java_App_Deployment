@@ -117,26 +117,26 @@ pipeline {
 
 			}
 		}
-        // stage('Approval'){
-        //     when {
-        //         not {
-        //             equals expected: true, actual: params.autoApprove
-        //         }
-        //     }
-        //     steps{
-        //         script{
-        //                 def plan = readFile /tfplan.txt'
-        //                 input message: "Do you want to apply Apply / Destroy this plan?",
-        //                 parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
-        //         }
-        //     }
-        // }
-        // stage('Apply') {
-        //     when { expression { "${params.Apply}" == 'true' } }
-        //     steps{
-        //         sh """pwd; cd ${WORKSPACE}; terraform apply -input=false tfplan"""
-        //     }
-        // }
+        stage('Approval'){
+            when {
+                not {
+                    equals expected: true, actual: params.autoApprove
+                }
+            }
+            steps{
+                script{
+                        def plan = readFile /tfplan.txt'
+                        input message: "Do you want to apply Apply / Destroy this plan?",
+                        parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
+                }
+            }
+        }
+        stage('Apply') {
+            when { expression { "${params.Apply}" == 'true' } }
+            steps{
+                sh """pwd; cd ${WORKSPACE}; terraform apply -input=false tfplan"""
+            }
+        }
         // stage('Destroy') {
         //     when { expression { "${params.Destroy}" == 'true' } }
         //     steps{
