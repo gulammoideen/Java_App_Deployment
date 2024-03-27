@@ -67,16 +67,16 @@ pipeline {
                 }
             }
         }
-        // stage('Docker_build') {
-        //     when { expression { "${params.Apply}" == 'true' } }
-        //     steps {
-        //         script {
-        //             sh """pwd;cd ${WORKSPACE}/; docker build . -t javaapp:${IMAGE_VERSION}"""
-        //             sh """pwd;cd ${WORKSPACE}/; docker tag javaapp:${IMAGE_VERSION} ${IMAGE_REGISTRY}:${IMAGE_VERSION}"""
-        //             sh """pwd;cd ${WORKSPACE}/; docker push ${IMAGE_REGISTRY}:${IMAGE_VERSION}"""
-        //         }
-        //     }
-        // }
+        stage('Docker_build') {
+            when { expression { "${params.Apply}" == 'true' } }
+            steps {
+                script {
+                    sh """pwd;cd ${WORKSPACE}/; docker build . -t javaapp:${IMAGE_VERSION}"""
+                    sh """pwd;cd ${WORKSPACE}/; docker tag javaapp:${IMAGE_VERSION} ${IMAGE_REGISTRY}:${IMAGE_VERSION}"""
+                    sh """pwd;cd ${WORKSPACE}/; docker push ${IMAGE_REGISTRY}:${IMAGE_VERSION}"""
+                }
+            }
+        }
         // stage('Update_manifest_YAML') {
         //     when { expression { "${params.Apply}" == 'true' } }
         //     steps {
