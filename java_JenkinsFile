@@ -12,7 +12,7 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
         DOCKER_CREDENTIALS = credentials('DockerCredentials')
         IMAGE_VERSION = "v1.0"
-        IMAGE_REGISTRY = "gulammoideen/javaapp"
+        IMAGE_REGISTRY = "gulammoideen/"
         AWS_REGION = "us-east-1"
         INSTANCE_TYPE = "t3a.xlarge"
         DESIRED_NODE_COUNT = "1"
