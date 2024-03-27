@@ -62,8 +62,8 @@ pipeline {
             when { expression { "${params.Apply}" == 'true' } }
             steps {
                 script {
-                    sh """pwd;cd ${WORKSPACE}/JAVA_BUILD; unzip *.zip """
-                    sh """pwd;cd ${WORKSPACE}/JAVA_BUILD/*/; mvn clean install"""
+                    sh """pwd;cd ${WORKSPACE}; unzip *.zip """
+                    sh """pwd;cd ${WORKSPACE}/*/; mvn clean install"""
                 }
             }
         }
@@ -71,9 +71,9 @@ pipeline {
         //     when { expression { "${params.Apply}" == 'true' } }
         //     steps {
         //         script {
-        //             sh """pwd;cd ${WORKSPACE}/JAVA_BUILD/; docker build . -t javaapp:${IMAGE_VERSION}"""
-        //             sh """pwd;cd ${WORKSPACE}/JAVA_BUILD/; docker tag javaapp:${IMAGE_VERSION} ${IMAGE_REGISTRY}:${IMAGE_VERSION}"""
-        //             sh """pwd;cd ${WORKSPACE}/JAVA_BUILD/; docker push ${IMAGE_REGISTRY}:${IMAGE_VERSION}"""
+        //             sh """pwd;cd ${WORKSPACE}/; docker build . -t javaapp:${IMAGE_VERSION}"""
+        //             sh """pwd;cd ${WORKSPACE}/; docker tag javaapp:${IMAGE_VERSION} ${IMAGE_REGISTRY}:${IMAGE_VERSION}"""
+        //             sh """pwd;cd ${WORKSPACE}/; docker push ${IMAGE_REGISTRY}:${IMAGE_VERSION}"""
         //         }
         //     }
         // }
@@ -81,8 +81,8 @@ pipeline {
         //     when { expression { "${params.Apply}" == 'true' } }
         //     steps {
         //         script {
-        //             UpdateStringInFile("__REGISTRY__","${IMAGE_REGISTRY}","${WORKSPACE}/JAVA_BUILD/deployment.yaml", )
-        //             UpdateStringInFile("__IMAGEVERSION__","${IMAGE_VERSION}","${WORKSPACE}/JAVA_BUILD/deployment.yaml", )
+        //             UpdateStringInFile("__REGISTRY__","${IMAGE_REGISTRY}","${WORKSPACE}/deployment.yaml", )
+        //             UpdateStringInFile("__IMAGEVERSION__","${IMAGE_VERSION}","${WORKSPACE}/deployment.yaml", )
 
         //         }
         //     }
@@ -92,24 +92,24 @@ pipeline {
         //     when { expression { "${params.Apply}" == 'true' } }
         //     steps {
         //         script {
-        //             UpdateStringInFile("__ACCESSKEY__","${AWS_ACCESS_KEY_ID}","${WORKSPACE}/JAVA_BUILD/0-provider.tf", )
-        //             UpdateStringInFile("__SECRETKEY__","${AWS_SECRET_ACCESS_KEY}","${WORKSPACE}/JAVA_BUILD/0-provider.tf", )
-        //             UpdateStringInFile("__AWSREGION__","${AWS_REGION}","${WORKSPACE}/JAVA_BUILD/0-provider.tf", )
-        //             UpdateStringInFile("__ACCESSKEY__","${AWS_ACCESS_KEY_ID}","${WORKSPACE}/JAVA_BUILD/ec2.tf", )
-        //             UpdateStringInFile("__SECRETKEY__","${AWS_SECRET_ACCESS_KEY}","${WORKSPACE}/JAVA_BUILD/ec2.tf", )
-        //             UpdateStringInFile("__AWSREGION__","${AWS_REGION}","${WORKSPACE}/JAVA_BUILD/ec2.tf", )
-        //             UpdateStringInFile("__INSTANCETYPE__","${INSTANCE_TYPE}","${WORKSPACE}/JAVA_BUILD/7-nodes.tf", )
-        //             UpdateStringInFile("__DESIREDNODECOUNT__","${DESIRED_NODE_COUNT}","${WORKSPACE}/JAVA_BUILD/7-nodes.tf", )
-        //             UpdateStringInFile("__MAXNODECOUNT__","${MAX_NODE_COUNT}","${WORKSPACE}/JAVA_BUILD/7-nodes.tf", )
+        //             UpdateStringInFile("__ACCESSKEY__","${AWS_ACCESS_KEY_ID}","${WORKSPACE}/0-provider.tf", )
+        //             UpdateStringInFile("__SECRETKEY__","${AWS_SECRET_ACCESS_KEY}","${WORKSPACE}/0-provider.tf", )
+        //             UpdateStringInFile("__AWSREGION__","${AWS_REGION}","${WORKSPACE}/0-provider.tf", )
+        //             UpdateStringInFile("__ACCESSKEY__","${AWS_ACCESS_KEY_ID}","${WORKSPACE}/ec2.tf", )
+        //             UpdateStringInFile("__SECRETKEY__","${AWS_SECRET_ACCESS_KEY}","${WORKSPACE}/ec2.tf", )
+        //             UpdateStringInFile("__AWSREGION__","${AWS_REGION}","${WORKSPACE}/ec2.tf", )
+        //             UpdateStringInFile("__INSTANCETYPE__","${INSTANCE_TYPE}","${WORKSPACE}/7-nodes.tf", )
+        //             UpdateStringInFile("__DESIREDNODECOUNT__","${DESIRED_NODE_COUNT}","${WORKSPACE}/7-nodes.tf", )
+        //             UpdateStringInFile("__MAXNODECOUNT__","${MAX_NODE_COUNT}","${WORKSPACE}/7-nodes.tf", )
         //         }
         //     }
         // }
         // stage('Plan') {
         //     when { expression { "${params.Apply}" == 'true' } }
 		//     steps {
-		// 	    sh """pwd;cd ${WORKSPACE}/JAVA_BUILD ; terraform init"""
-        //         sh """pwd;cd ${WORKSPACE}/JAVA_BUILD ; terraform plan -out tfplan"""
-        //         sh """pwd;cd ${WORKSPACE}/JAVA_BUILD ; terraform show -no-color tfplan > ${WORKSPACE}/JAVA_BUILD/tfplan.txt"""
+		// 	    sh """pwd;cd ${WORKSPACE} ; terraform init"""
+        //         sh """pwd;cd ${WORKSPACE} ; terraform plan -out tfplan"""
+        //         sh """pwd;cd ${WORKSPACE} ; terraform show -no-color tfplan > ${WORKSPACE}/tfplan.txt"""
 
 		// 	}
 		// }
@@ -121,7 +121,7 @@ pipeline {
         //     }
         //     steps{
         //         script{
-        //                 def plan = readFile 'JAVA_BUILD/tfplan.txt'
+        //                 def plan = readFile /tfplan.txt'
         //                 input message: "Do you want to apply Apply / Destroy this plan?",
         //                 parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
         //         }
@@ -130,13 +130,13 @@ pipeline {
         // stage('Apply') {
         //     when { expression { "${params.Apply}" == 'true' } }
         //     steps{
-        //         sh """pwd; cd ${WORKSPACE}/JAVA_BUILD; terraform apply -input=false tfplan"""
+        //         sh """pwd; cd ${WORKSPACE}; terraform apply -input=false tfplan"""
         //     }
         // }
         // stage('Destroy') {
         //     when { expression { "${params.Destroy}" == 'true' } }
         //     steps{
-        //         sh """pwd; cd ${WORKSPACE}/JAVA_BUILD; terraform destroy -auto-approve"""
+        //         sh """pwd; cd ${WORKSPACE}; terraform destroy -auto-approve"""
         //     }
         // }
 	}
