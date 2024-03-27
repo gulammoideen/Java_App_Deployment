@@ -137,11 +137,11 @@ pipeline {
                 sh """pwd; cd ${WORKSPACE}; terraform apply -input=false tfplan"""
             }
         }
-        // stage('Destroy') {
-        //     when { expression { "${params.Destroy}" == 'true' } }
-        //     steps{
-        //         sh """pwd; cd ${WORKSPACE}; terraform destroy -auto-approve"""
-        //     }
-        // }
+        stage('Destroy') {
+            when { expression { "${params.Destroy}" == 'true' } }
+            steps{
+                sh """pwd; cd ${WORKSPACE}; terraform destroy -auto-approve"""
+            }
+        }
 	}
 }
