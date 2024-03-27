@@ -81,33 +81,33 @@ pipeline {
                 }
             }
         }
-        // stage('Update_manifest_YAML') {
-        //     when { expression { "${params.Apply}" == 'true' } }
-        //     steps {
-        //         script {
-        //             UpdateStringInFile("__REGISTRY__","${IMAGE_REGISTRY}","${WORKSPACE}/deployment.yaml", )
-        //             UpdateStringInFile("__IMAGEVERSION__","${IMAGE_VERSION}","${WORKSPACE}/deployment.yaml", )
+        stage('Update_manifest_YAML') {
+            when { expression { "${params.Apply}" == 'true' } }
+            steps {
+                script {
+                    UpdateStringInFile("__REGISTRY__","${IMAGE_REGISTRY}","${WORKSPACE}/deployment.yaml", )
+                    UpdateStringInFile("__IMAGEVERSION__","${IMAGE_VERSION}","${WORKSPACE}/deployment.yaml", )
 
-        //         }
-        //     }
-        // }
+                }
+            }
+        }
 
-        // stage('Update_manifest_TF') {
-        //     when { expression { "${params.Apply}" == 'true' } }
-        //     steps {
-        //         script {
-        //             UpdateStringInFile("__ACCESSKEY__","${AWS_ACCESS_KEY_ID}","${WORKSPACE}/0-provider.tf", )
-        //             UpdateStringInFile("__SECRETKEY__","${AWS_SECRET_ACCESS_KEY}","${WORKSPACE}/0-provider.tf", )
-        //             UpdateStringInFile("__AWSREGION__","${AWS_REGION}","${WORKSPACE}/0-provider.tf", )
-        //             UpdateStringInFile("__ACCESSKEY__","${AWS_ACCESS_KEY_ID}","${WORKSPACE}/ec2.tf", )
-        //             UpdateStringInFile("__SECRETKEY__","${AWS_SECRET_ACCESS_KEY}","${WORKSPACE}/ec2.tf", )
-        //             UpdateStringInFile("__AWSREGION__","${AWS_REGION}","${WORKSPACE}/ec2.tf", )
-        //             UpdateStringInFile("__INSTANCETYPE__","${INSTANCE_TYPE}","${WORKSPACE}/7-nodes.tf", )
-        //             UpdateStringInFile("__DESIREDNODECOUNT__","${DESIRED_NODE_COUNT}","${WORKSPACE}/7-nodes.tf", )
-        //             UpdateStringInFile("__MAXNODECOUNT__","${MAX_NODE_COUNT}","${WORKSPACE}/7-nodes.tf", )
-        //         }
-        //     }
-        // }
+        stage('Update_manifest_TF') {
+            when { expression { "${params.Apply}" == 'true' } }
+            steps {
+                script {
+                    UpdateStringInFile("__ACCESSKEY__","${AWS_ACCESS_KEY_ID}","${WORKSPACE}/0-provider.tf", )
+                    UpdateStringInFile("__SECRETKEY__","${AWS_SECRET_ACCESS_KEY}","${WORKSPACE}/0-provider.tf", )
+                    UpdateStringInFile("__AWSREGION__","${AWS_REGION}","${WORKSPACE}/0-provider.tf", )
+                    UpdateStringInFile("__ACCESSKEY__","${AWS_ACCESS_KEY_ID}","${WORKSPACE}/ec2.tf", )
+                    UpdateStringInFile("__SECRETKEY__","${AWS_SECRET_ACCESS_KEY}","${WORKSPACE}/ec2.tf", )
+                    UpdateStringInFile("__AWSREGION__","${AWS_REGION}","${WORKSPACE}/ec2.tf", )
+                    UpdateStringInFile("__INSTANCETYPE__","${INSTANCE_TYPE}","${WORKSPACE}/7-nodes.tf", )
+                    UpdateStringInFile("__DESIREDNODECOUNT__","${DESIRED_NODE_COUNT}","${WORKSPACE}/7-nodes.tf", )
+                    UpdateStringInFile("__MAXNODECOUNT__","${MAX_NODE_COUNT}","${WORKSPACE}/7-nodes.tf", )
+                }
+            }
+        }
         // stage('Plan') {
         //     when { expression { "${params.Apply}" == 'true' } }
 		//     steps {
