@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: javaapp-container
-          image: gulammoideen/javaapp:v1.0
+          image: __REGISTRY__/javaapp:__IMAGEVERSION__
           ports:
             - name: javaappport
               containerPort: 8080

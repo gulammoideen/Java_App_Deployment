@@ -1,0 +1,142 @@
+def UpdateStringInFile(String placeholder, String value, String filename) {    
+    script {
+        def replace_string = readFile file: "$filename"
+        replace_string = replace_string.replaceAll("$placeholder", "$value")
+        writeFile file: "$filename", text: replace_string
+        println "$filename updated with $value"
+    }
+}
+pipeline {
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        IMAGE_VERSION = "v1.0"
+        IMAGE_REGISTRY = "gulammoideen/javaapp"
+        AWS_REGION = "us-east-1"
+        INSTANCE_TYPE = "t3a.xlarge"
+        DESIRED_NODE_COUNT = "1"
+        MAX_NODE_COUNT = "10"
+    }
+    agent any
+    stages {
+        stage('Cleaning Workspace') {
+          when { expression { "${params.Apply}" == 'true' } }
+          steps {
+              sh 'echo ${WORKSPACE}'
+              sh 'whoami'
+              sh 'sudo rm -rvf ${WORKSPACE}/*'
+          }
+        }
+        stage('Initializing-Parameters') {
+            steps {
+                script {
+                    properties([
+                        parameters([
+                            booleanParam(name: 'autoApprove', defaultValue: false, description: 'Automatically run apply after generating plan?'),
+                            booleanParam(name: 'Apply', defaultValue: false, description: 'Check if you want to Apply'),
+                            booleanParam(name: 'Destroy', defaultValue: false, description: 'Check if you want to Destroy'),
+                        ])
+                    ])
+                }
+            }
+        }
+     
+     stage('Checkout') {
+      parallel {
+        stage('Checkout_Repo') {
+            when { expression { "${params.Apply}" == 'true' } }
+                steps {
+                checkout([$class: 'GitSCM',
+                          branches: [[name: "main"]],
+                          doGenerateSubmoduleConfigurations: false,
+                          extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'aws_apache2_ubuntu']],
+                          gitTool: 'Default',
+                          submoduleCfg: [],
+                          userRemoteConfigs: [[credentialsId: 'private.gulam', url: 'https://github.com/gulammoideen/Java_App_Deployment.git']]
+                        ])
+            }
+        }
+      }
+     }  
+        stage('JAR_build') {
+            when { expression { "${params.Apply}" == 'true' } }
+            steps {
+                script {
+                    sh """pwd;cd ${WORKSPACE}/aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU/*/; mvn clean install"""
+                }
+            }
+        }
+        stage('Docker_build') {
+            when { expression { "${params.Apply}" == 'true' } }
+            steps {
+                script {
+                    sh """pwd;cd ${WORKSPACE}/aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU/; docker build . -t javaapp:${IMAGE_VERSION}"""
+                    sh """pwd;cd ${WORKSPACE}/aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU/; docker tag javaapp:${IMAGE_VERSION} ${IMAGE_REGISTRY}:${IMAGE_VERSION}"""
+                    sh """pwd;cd ${WORKSPACE}/aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU/; docker push ${IMAGE_REGISTRY}:${IMAGE_VERSION}"""
+                }
+            }
+        }
+        stage('Update_manifest_YAML') {
+            when { expression { "${params.Apply}" == 'true' } }
+            steps {
+                script {
+                    UpdateStringInFile("__REGISTRY__","${IMAGE_REGISTRY}","${WORKSPACE}/aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU/deployment.yaml", )
+                    UpdateStringInFile("__IMAGEVERSION__","${IMAGE_VERSION}","${WORKSPACE}/aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU/deployment.yaml", )
+
+                }
+            }
+        }
+
+        stage('Update_manifest_TF') {
+            when { expression { "${params.Apply}" == 'true' } }
+            steps {
+                script {
+                    UpdateStringInFile("__ACCESSKEY__","${AWS_ACCESS_KEY_ID}","${WORKSPACE}/aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU/0-provider.tf", )
+                    UpdateStringInFile("__SECRETKEY__","${AWS_SECRET_ACCESS_KEY}","${WORKSPACE}/aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU/0-provider.tf", )
+                    UpdateStringInFile("__AWSREGION__","${AWS_REGION}","${WORKSPACE}/aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU/0-provider.tf", )
+                    UpdateStringInFile("__ACCESSKEY__","${AWS_ACCESS_KEY_ID}","${WORKSPACE}/aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU/ec2.tf", )
+                    UpdateStringInFile("__SECRETKEY__","${AWS_SECRET_ACCESS_KEY}","${WORKSPACE}/aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU/ec2.tf", )
+                    UpdateStringInFile("__AWSREGION__","${AWS_REGION}","${WORKSPACE}/aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU/ec2.tf", )
+                    UpdateStringInFile("__INSTANCETYPE__","${INSTANCE_TYPE}","${WORKSPACE}/aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU/7-nodes.tf", )
+                    UpdateStringInFile("__DESIREDNODECOUNT__","${DESIRED_NODE_COUNT}","${WORKSPACE}/aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU/7-nodes.tf", )
+                    UpdateStringInFile("__MAXNODECOUNT__","${MAX_NODE_COUNT}","${WORKSPACE}/aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU/7-nodes.tf", )
+                }
+            }
+        }
+        stage('Plan') {
+            when { expression { "${params.Apply}" == 'true' } }
+		    steps {
+			    sh """pwd;cd ${WORKSPACE}/aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU ; terraform init"""
+                sh """pwd;cd ${WORKSPACE}/aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU ; terraform plan -out tfplan"""
+                sh """pwd;cd ${WORKSPACE}/aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU ; terraform show -no-color tfplan > ${WORKSPACE}/aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU/tfplan.txt"""
+
+			}
+		}
+        stage('Approval'){
+            when {
+                not {
+                    equals expected: true, actual: params.autoApprove
+                }
+            }
+            steps{
+                script{
+                        def plan = readFile 'aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU/tfplan.txt'
+                        input message: "Do you want to apply Apply / Destroy this plan?",
+                        parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
+                }
+            }
+        }
+        stage('Apply') {
+            when { expression { "${params.Apply}" == 'true' } }
+            steps{
+                sh """pwd; cd ${WORKSPACE}/aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU; terraform apply -input=false tfplan"""
+            }
+        }
+        stage('Destroy') {
+            when { expression { "${params.Destroy}" == 'true' } }
+            steps{
+                sh """pwd; cd ${WORKSPACE}/aws_apache2_ubuntu/Terraform/AWS_APACHE2_UBUNTU; terraform destroy -auto-approve"""
+            }
+        }
+	}
+}
