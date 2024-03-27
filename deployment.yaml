@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: javaapp-container
-          image: __REGISTRY__/javaapp:__IMAGEVERSION__
+          image: __REGISTRY__:__IMAGEVERSION__
           ports:
             - name: javaappport
               containerPort: 8080
