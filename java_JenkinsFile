@@ -39,7 +39,9 @@ pipeline {
                         ])
                     ])
                     withCredentials([usernamePassword(credentialsId: 'DockerCredentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    sh 'docker login -u $DOCKER_USERNAME --password-stdin $DOCKER_PASSWORD'
+                    sh 'pwd; echo $DOCKER_PASSWORD > password.txt'
+                    sh 'pwd; docker login -u $DOCKER_USERNAME --password-stdin > password.txt'
+                    sh 'pwd; rm -f password.txt'
                     }
                 }
             }
